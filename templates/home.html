@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Site</title>
+</head>
+
+<body style="margin:0; font-family:Arial; background:#f4f6f8;">
+
+<!-- Header -->
+<div style="background:#111; color:white; padding:15px; text-align:center;">
+    <h1>📰 موقعي الإخباري</h1>
+</div>
+
+<!-- Add Button -->
+<div style="text-align:center; margin:20px;">
+    <a href="/add" style="background:green; color:white; padding:10px 20px; text-decoration:none; border-radius:8px;">
+        ➕ إضافة خبر
+    </a>
+</div>
+
+<!-- News -->
+{% for n in news %}
+<div style="width:80%; margin:15px auto; background:white; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+
+    {% if n[3] %}
+        <img src="{{ n[3] }}" style="width:100%; border-radius:10px; max-height:300px; object-fit:cover;">
+    {% endif %}
+
+    <h2>{{ n[1] }}</h2>
+    <p>{{ n[2] }}</p>
+
+    <div>
+        <a href="/edit/{{ n[0] }}" style="color:blue;">✏️ تعديل</a>
+        |
+        <a href="/delete/{{ n[0] }}" style="color:red;">🗑️ حذف</a>
+    </div>
+
+</div>
+{% endfor %}
+
+</body>
+</html>
