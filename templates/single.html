@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ news[1] }}</title>
+
+    <style>
+        body{
+            font-family: Arial;
+            background:#f4f4f4;
+            direction:rtl;
+            margin:0;
+        }
+
+        .container{
+            width:90%;
+            max-width:800px;
+            margin:auto;
+            margin-top:20px;
+            background:white;
+            padding:20px;
+            border-radius:10px;
+        }
+
+        img{
+            width:100%;
+            border-radius:10px;
+            margin-bottom:20px;
+        }
+
+        h1{
+            margin-bottom:20px;
+        }
+
+        p{
+            line-height:2;
+            color:#444;
+        }
+
+        .date{
+            color:gray;
+            margin-top:20px;
+        }
+
+        a{
+            display:inline-block;
+            margin-top:20px;
+            text-decoration:none;
+            background:#111;
+            color:white;
+            padding:10px 20px;
+            border-radius:5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        {% if news[3] %}
+        <img src="/{{ news[3] }}">
+        {% endif %}
+
+        <h1>{{ news[1] }}</h1>
+
+        <p>{{ news[2] }}</p>
+
+        <div class="date">
+            📅 {{ news[4] }}
+        </div>
+
+        <a href="/">⬅ رجوع</a>
+
+    </div>
+
+</body>
+</html>

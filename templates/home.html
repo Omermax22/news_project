@@ -94,8 +94,11 @@
             {% endif %}
 
             <div class="content">
-
-                <h2>{{ item[1] }}</h2>
+<h2>
+    <a href="/news/{{ item[0] }}" style="text-decoration:none; color:black;">
+        {{ item[1] }}
+    </a>
+</h2>                <h2>{{ item[1] }}</h2>
 
                 <p>{{ item[2] }}</p>
 
