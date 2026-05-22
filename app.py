@@ -11,7 +11,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "static/uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# تأكد من وجود المجلد
+# إنشاء المجلد إذا غير موجود
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # =========================
@@ -20,15 +20,17 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def init_db():
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
+
     c.execute("""
         CREATE TABLE IF NOT EXISTS news (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            content TEXT NOT NULL,
+            title TEXT,
+            content TEXT,
             image TEXT,
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+
     conn.commit()
     conn.close()
 
@@ -39,35 +41,53 @@ init_db()
 # =========================
 @app.route('/')
 def home():
+
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
+
     c.execute("SELECT * FROM news ORDER BY id DESC")
     news = c.fetchall()
+
     conn.close()
+
     return render_template("home.html", news=news)
 
 # =========================
 # إضافة خبر
 # =========================
 @app.route('/add', methods=['GET', 'POST'])
-def add_news():
+def add():
+
     if request.method == 'POST':
+
         title = request.form['title']
         content = request.form['content']
 
-        image_file = request.files['image']
+        image = request.files.get('image')
+
         filename = None
 
-        if image_file and image_file.filename != "":
-            filename = secure_filename(image_file.filename)
-            image_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-            image_file.save(image_path)
+        if image and image.filename != "":
+
+            filename = secure_filename(image.filename)
+
+            image_path = os.path.join(
+                app.config["UPLOAD_FOLDER"],
+                filename
+            )
+
+            image.save(image_path)
+
             filename = image_path
 
         conn = sqlite3.connect("news.db")
         c = conn.cursor()
-        c.execute("INSERT INTO news (title, content, image) VALUES (?, ?, ?)",
-                  (title, content, filename))
+
+        c.execute(
+            "INSERT INTO news (title, content, image) VALUES (?, ?, ?)",
+            (title, content, filename)
+        )
+
         conn.commit()
         conn.close()
 
@@ -76,7 +96,7 @@ def add_news():
     return render_template("add.html")
 
 # =========================
-# تشغيل التطبيق
+# صفحة الخبر
 # =========================
 @app.route('/news/<int:news_id>')
 def single_news(news_id):
@@ -90,5 +110,9 @@ def single_news(news_id):
     conn.close()
 
     return render_template("single.html", news=news)
+
+# =========================
+# تشغيل التطبيق
+# =========================
 if __name__ == "__main__":
     app.run(debug=True)
