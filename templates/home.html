@@ -54,14 +54,10 @@
             border-radius:10px;
         }
 
-        .btn{
-            display:inline-block;
-            padding:8px 12px;
-            background:#111;
-            color:#fff;
-            text-decoration:none;
+        img{
+            max-width:100%;
+            border-radius:10px;
             margin-top:10px;
-            border-radius:5px;
         }
     </style>
 </head>
@@ -69,16 +65,22 @@
 <body>
 
 <div class="header">
-    📰 موقع الأخبار
+    📰 موقعي الإخباري
 </div>
 
 <div class="container">
 
-    <!-- إضافة خبر -->
-    <form action="/add" method="POST">
+    <!-- فورم إضافة خبر -->
+    <form action="/add" method="POST" enctype="multipart/form-data">
+
         <input type="text" name="title" placeholder="عنوان الخبر">
+
         <textarea name="content" placeholder="محتوى الخبر"></textarea>
+
+        <input type="file" name="image">
+
         <button type="submit">نشر الخبر</button>
+
     </form>
 
     <hr>
@@ -86,8 +88,15 @@
     <!-- عرض الأخبار -->
     {% for n in news %}
     <div class="news">
-        <h3>{{ n[1] }}</h3>
+
+        <h2>{{ n[1] }}</h2>
+
         <p>{{ n[2] }}</p>
+
+        {% if n[3] %}
+            <img src="/{{ n[3] }}">
+        {% endif %}
+
     </div>
     {% endfor %}
 

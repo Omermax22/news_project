@@ -24,7 +24,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS news (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
-        content TEXT NOT NULL
+        content TEXT NOT NULL,
+        image TEXT
     )
     """)
 
@@ -53,16 +54,35 @@ def home():
 # =========================
 @app.route("/add", methods=["POST"])
 def add_news():
+
     title = request.form.get("title")
     content = request.form.get("content")
 
-    if not title or not content:
-        return "❌ البيانات ناقصة"
+    image = request.files.get("image")
+
+    image_path = ""
+
+    # حفظ الصورة
+    if image and image.filename != "":
+
+        filename = secure_filename(image.filename)
+
+        filepath = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            filename
+        )
+
+        image.save(filepath)
+
+        image_path = filepath
 
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
 
-    c.execute("INSERT INTO news (title, content) VALUES (?, ?)", (title, content))
+    c.execute(
+        "INSERT INTO news (title, content, image) VALUES (?, ?, ?)",
+        (title, content, image_path)
+    )
 
     conn.commit()
     conn.close()
