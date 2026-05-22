@@ -1,7 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for
+import os
 import sqlite3
+from flask import Flask, render_template, request, redirect, url_for
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+# =========================
+# إعداد رفع الصور
+# =========================
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # =========================
 # قاعدة البيانات
@@ -36,19 +44,27 @@ def home():
     return render_template("home.html", news=news)
 
 # =========================
-# إضافة خبر
+# إضافة خبر + رفع صورة
 # =========================
 @app.route('/add', methods=['GET', 'POST'])
 def add_news():
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
-        image = request.form['image']
+        image_file = request.files['image']
+
+        image_path = None
+
+        if image_file and image_file.filename != "":
+            filename = secure_filename(image_file.filename)
+            path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            image_file.save(path)
+            image_path = path
 
         conn = sqlite3.connect("news.db")
         c = conn.cursor()
         c.execute("INSERT INTO news (title, content, image) VALUES (?, ?, ?)",
-                  (title, content, image))
+                  (title, content, image_path))
         conn.commit()
         conn.close()
 
@@ -93,7 +109,7 @@ def edit_news(id):
     return render_template("edit.html", news=news)
 
 # =========================
-# تشغيل التطبيق
+# تشغيل السيرفر
 # =========================
 if __name__ == "__main__":
     app.run(debug=True)
