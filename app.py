@@ -78,5 +78,17 @@ def add_news():
 # =========================
 # تشغيل التطبيق
 # =========================
+@app.route('/news/<int:news_id>')
+def single_news(news_id):
+
+    conn = sqlite3.connect("news.db")
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM news WHERE id=?", (news_id,))
+    news = c.fetchone()
+
+    conn.close()
+
+    return render_template("single.html", news=news)
 if __name__ == "__main__":
     app.run(debug=True)
