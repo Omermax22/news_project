@@ -1,17 +1,21 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 
 app = Flask(__name__)
 
+# =========================
+# قاعدة البيانات
+# =========================
 def init_db():
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
     c.execute("""
         CREATE TABLE IF NOT EXISTS news (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            content TEXT,
-            image TEXT
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            image TEXT,
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     conn.commit()
@@ -19,6 +23,9 @@ def init_db():
 
 init_db()
 
+# =========================
+# الصفحة الرئيسية
+# =========================
 @app.route('/')
 def home():
     conn = sqlite3.connect("news.db")
@@ -28,12 +35,15 @@ def home():
     conn.close()
     return render_template("home.html", news=news)
 
-@app.route('/add', methods=["GET", "POST"])
+# =========================
+# إضافة خبر
+# =========================
+@app.route('/add', methods=['GET', 'POST'])
 def add_news():
-    if request.method == "POST":
-        title = request.form["title"]
-        content = request.form["content"]
-        image = request.form["image"]
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        image = request.form['image']
 
         conn = sqlite3.connect("news.db")
         c = conn.cursor()
@@ -41,34 +51,40 @@ def add_news():
                   (title, content, image))
         conn.commit()
         conn.close()
-        return redirect("/")
+
+        return redirect(url_for('home'))
 
     return render_template("add.html")
 
+# =========================
+# حذف خبر
+# =========================
 @app.route('/delete/<int:id>')
-def delete(id):
+def delete_news(id):
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
     c.execute("DELETE FROM news WHERE id=?", (id,))
     conn.commit()
     conn.close()
-    return redirect("/")
+    return redirect(url_for('home'))
 
-@app.route('/edit/<int:id>', methods=["GET","POST"])
-def edit(id):
+# =========================
+# تعديل خبر
+# =========================
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_news(id):
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
 
-    if request.method == "POST":
-        title = request.form["title"]
-        content = request.form["content"]
-        image = request.form["image"]
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
 
-        c.execute("UPDATE news SET title=?, content=?, image=? WHERE id=?",
-                  (title, content, image, id))
+        c.execute("UPDATE news SET title=?, content=? WHERE id=?",
+                  (title, content, id))
         conn.commit()
         conn.close()
-        return redirect("/")
+        return redirect(url_for('home'))
 
     c.execute("SELECT * FROM news WHERE id=?", (id,))
     news = c.fetchone()
@@ -76,5 +92,8 @@ def edit(id):
 
     return render_template("edit.html", news=news)
 
+# =========================
+# تشغيل التطبيق
+# =========================
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
