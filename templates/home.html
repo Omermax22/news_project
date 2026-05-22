@@ -3,116 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقعي الإخباري</title>
+    <title>موقع الأخبار</title>
 
     <style>
         body{
             font-family: Arial;
             background:#f4f4f4;
             margin:0;
-            padding:0;
             direction: rtl;
         }
 
         .header{
             background:#111;
-            color:white;
-            padding:20px;
+            color:#fff;
+            padding:15px;
             text-align:center;
-        }
-
-        .add-btn{
-            display:inline-block;
-            margin-top:10px;
-            padding:10px 20px;
-            background:red;
-            color:white;
-            text-decoration:none;
-            border-radius:5px;
         }
 
         .container{
             width:90%;
             margin:auto;
-            margin-top:20px;
+            padding:20px;
         }
 
-        .card{
-            background:white;
-            border-radius:10px;
-            overflow:hidden;
-            margin-bottom:20px;
-            box-shadow:0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .card img{
-            width:100%;
-            height:220px;
-            object-fit:cover;
-        }
-
-        .content{
+        form{
+            background:#fff;
             padding:15px;
+            border-radius:10px;
+            margin-bottom:20px;
         }
 
-        .content h2{
-            margin:0;
-            margin-bottom:10px;
+        input, textarea{
+            width:100%;
+            padding:10px;
+            margin:10px 0;
         }
 
-        .content p{
-            color:#555;
-            line-height:1.7;
+        button{
+            padding:10px 15px;
+            background:#111;
+            color:#fff;
+            border:none;
+            cursor:pointer;
         }
 
-        .date{
-            color:gray;
-            font-size:14px;
+        .news{
+            background:#fff;
+            padding:15px;
+            margin-bottom:15px;
+            border-radius:10px;
+        }
+
+        .btn{
+            display:inline-block;
+            padding:8px 12px;
+            background:#111;
+            color:#fff;
+            text-decoration:none;
             margin-top:10px;
+            border-radius:5px;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="header">
-        <h1>📰 موقعي الإخباري</h1>
+<div class="header">
+    📰 موقع الأخبار
+</div>
 
-        <a href="/add" class="add-btn">
-            ➕ إضافة خبر
-        </a>
+<div class="container">
+
+    <!-- إضافة خبر -->
+    <form action="/add" method="POST">
+        <input type="text" name="title" placeholder="عنوان الخبر">
+        <textarea name="content" placeholder="محتوى الخبر"></textarea>
+        <button type="submit">نشر الخبر</button>
+    </form>
+
+    <hr>
+
+    <!-- عرض الأخبار -->
+    {% for n in news %}
+    <div class="news">
+        <h3>{{ n[1] }}</h3>
+        <p>{{ n[2] }}</p>
     </div>
+    {% endfor %}
 
-    <div class="container">
-
-        {% for item in news %}
-
-        <div class="card">
-
-            {% if item[3] %}
-            <img src="/{{ item[3] }}">
-            {% endif %}
-
-            <div class="content">
-<h2>
-    <a href="/news/{{ item[0] }}" style="text-decoration:none; color:black;">
-        {{ item[1] }}
-    </a>
-</h2>                <h2>{{ item[1] }}</h2>
-
-                <p>{{ item[2] }}</p>
-
-                <div class="date">
-                    📅 {{ item[4] }}
-                </div>
-
-            </div>
-
-        </div>
-
-        {% endfor %}
-
-    </div>
+</div>
 
 </body>
 </html>
