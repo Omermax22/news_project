@@ -26,27 +26,6 @@
             padding:20px;
         }
 
-        form{
-            background:#fff;
-            padding:15px;
-            border-radius:10px;
-            margin-bottom:20px;
-        }
-
-        input, textarea{
-            width:100%;
-            padding:10px;
-            margin:10px 0;
-        }
-
-        button{
-            padding:10px 15px;
-            background:#111;
-            color:#fff;
-            border:none;
-            cursor:pointer;
-        }
-
         .news{
             background:#fff;
             padding:15px;
@@ -59,31 +38,26 @@
             border-radius:10px;
             margin-top:10px;
         }
+
+        a{
+            display:inline-block;
+            margin-top:10px;
+            padding:8px 12px;
+            background:#111;
+            color:#fff;
+            text-decoration:none;
+            border-radius:5px;
+        }
     </style>
 </head>
 
 <body>
 
 <div class="header">
-    📰 موقعي الإخباري
+    📰 موقع الأخبار
 </div>
 
 <div class="container">
-
-    <!-- فورم إضافة خبر -->
-    <form action="/add" method="POST" enctype="multipart/form-data">
-
-        <input type="text" name="title" placeholder="عنوان الخبر">
-
-        <textarea name="content" placeholder="محتوى الخبر"></textarea>
-
-        <input type="file" name="image">
-
-        <button type="submit">نشر الخبر</button>
-
-    </form>
-
-    <hr>
 
     <!-- عرض الأخبار -->
     {% for n in news %}
@@ -96,6 +70,8 @@
         {% if n[3] %}
             <img src="/{{ n[3] }}">
         {% endif %}
+
+        <a href="/news/{{ n[0] }}">📖 اقرأ المزيد</a>
 
     </div>
     {% endfor %}

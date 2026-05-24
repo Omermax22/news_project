@@ -10,7 +10,6 @@ app = Flask(__name__)
 # =========================
 UPLOAD_FOLDER = "static/uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # =========================
@@ -46,34 +45,37 @@ def home():
     news = c.fetchall()
 
     conn.close()
-
     return render_template("home.html", news=news)
+
+# =========================
+# لوحة التحكم
+# =========================
+@app.route("/secret-admin")
+def admin():
+    conn = sqlite3.connect("news.db")
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM news ORDER BY id DESC")
+    news = c.fetchall()
+
+    conn.close()
+    return render_template("admin.html", news=news)
 
 # =========================
 # إضافة خبر
 # =========================
 @app.route("/add", methods=["POST"])
 def add_news():
-
     title = request.form.get("title")
     content = request.form.get("content")
-
     image = request.files.get("image")
 
     image_path = ""
 
-    # حفظ الصورة
     if image and image.filename != "":
-
         filename = secure_filename(image.filename)
-
-        filepath = os.path.join(
-            app.config["UPLOAD_FOLDER"],
-            filename
-        )
-
+        filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
         image.save(filepath)
-
         image_path = filepath
 
     conn = sqlite3.connect("news.db")
@@ -87,10 +89,68 @@ def add_news():
     conn.commit()
     conn.close()
 
-    return redirect(url_for("home"))
+    return redirect(url_for("admin"))
+
+# =========================
+# حذف خبر
+# =========================
+@app.route("/delete/<int:news_id>")
+def delete_news(news_id):
+    conn = sqlite3.connect("news.db")
+    c = conn.cursor()
+
+    c.execute("DELETE FROM news WHERE id=?", (news_id,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("admin"))
+
+# =========================
+# تعديل خبر
+# =========================
+@app.route("/edit/<int:news_id>", methods=["GET", "POST"])
+def edit_news(news_id):
+    conn = sqlite3.connect("news.db")
+    c = conn.cursor()
+
+    if request.method == "POST":
+        title = request.form.get("title")
+        content = request.form.get("content")
+
+        c.execute(
+            "UPDATE news SET title=?, content=? WHERE id=?",
+            (title, content, news_id)
+        )
+
+        conn.commit()
+        conn.close()
+        return redirect(url_for("admin"))
+
+    c.execute("SELECT * FROM news WHERE id=?", (news_id,))
+    news = c.fetchone()
+
+    conn.close()
+
+    return render_template("edit.html", news=news)
+
+# =========================
+# عرض خبر واحد
+# =========================
+@app.route("/news/<int:news_id>")
+def single_news(news_id):
+    conn = sqlite3.connect("news.db")
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM news WHERE id=?", (news_id,))
+    news = c.fetchone()
+
+    conn.close()
+
+    return render_template("single.html", news=news)
 
 # =========================
 # تشغيل السيرفر
 # =========================
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة التحكم</title>
+
+    <style>
+        body{
+            font-family: Arial;
+            background:#f4f4f4;
+            direction: rtl;
+            padding:20px;
+        }
+
+        form{
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            margin-bottom:20px;
+        }
+
+        input, textarea{
+            width:100%;
+            padding:10px;
+            margin:10px 0;
+        }
+
+        button{
+            padding:10px 15px;
+            background:#111;
+            color:white;
+            border:none;
+            cursor:pointer;
+        }
+
+        .news{
+            background:white;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:15px;
+        }
+
+        img{
+            max-width:100%;
+            margin-top:10px;
+            border-radius:10px;
+        }
+
+        a{
+            display:inline-block;
+            margin-top:10px;
+            padding:8px 12px;
+            color:white;
+            text-decoration:none;
+            border-radius:5px;
+        }
+
+        .edit{
+            background:green;
+        }
+
+        .delete{
+            background:red;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🔐 لوحة التحكم</h1>
+
+<!-- إضافة خبر -->
+<form action="/add" method="POST" enctype="multipart/form-data">
+
+    <input type="text" name="title" placeholder="عنوان الخبر">
+
+    <textarea name="content" placeholder="محتوى الخبر"></textarea>
+
+    <input type="file" name="image">
+
+    <button type="submit">نشر الخبر</button>
+
+</form>
+
+<hr>
+
+<!-- عرض الأخبار -->
+{% for n in news %}
+<div class="news">
+
+    <h2>{{ n[1] }}</h2>
+
+    <p>{{ n[2] }}</p>
+
+    {% if n[3] %}
+        <img src="/{{ n[3] }}">
+    {% endif %}
+
+    <br>
+
+    <a class="edit" href="/edit/{{ n[0] }}">✏️ تعديل</a>
+
+    <a class="delete" href="/delete/{{ n[0] }}">🗑 حذف</a>
+
+</div>
+{% endfor %}
+
+</body>
+</html>
