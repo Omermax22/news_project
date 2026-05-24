@@ -1,19 +1,24 @@
 import os
 import sqlite3
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 # =========================
-# إعداد رفع الصور
+# Secret Key
+# =========================
+app.secret_key = "news_secret_key_2026"
+
+# =========================
+# Upload folder
 # =========================
 UPLOAD_FOLDER = "static/uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # =========================
-# قاعدة البيانات
+# Database setup
 # =========================
 def init_db():
     conn = sqlite3.connect("news.db")
@@ -34,7 +39,7 @@ def init_db():
 init_db()
 
 # =========================
-# الصفحة الرئيسية
+# Home page (visitors)
 # =========================
 @app.route("/")
 def home():
@@ -48,10 +53,37 @@ def home():
     return render_template("home.html", news=news)
 
 # =========================
-# لوحة التحكم
+# Login page
+# =========================
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username == "omer Hassan" and password == "2002omerhassan@omer":
+            session["admin"] = True
+            return redirect(url_for("admin"))
+
+    return render_template("login.html")
+
+# =========================
+# Logout
+# =========================
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+# =========================
+# Admin panel (protected)
 # =========================
 @app.route("/secret-admin")
 def admin():
+
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
 
@@ -62,10 +94,14 @@ def admin():
     return render_template("admin.html", news=news)
 
 # =========================
-# إضافة خبر
+# Add news
 # =========================
 @app.route("/add", methods=["POST"])
 def add_news():
+
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
     title = request.form.get("title")
     content = request.form.get("content")
     image = request.files.get("image")
@@ -92,10 +128,14 @@ def add_news():
     return redirect(url_for("admin"))
 
 # =========================
-# حذف خبر
+# Delete news
 # =========================
 @app.route("/delete/<int:news_id>")
 def delete_news(news_id):
+
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
 
@@ -107,10 +147,14 @@ def delete_news(news_id):
     return redirect(url_for("admin"))
 
 # =========================
-# تعديل خبر
+# Edit news
 # =========================
 @app.route("/edit/<int:news_id>", methods=["GET", "POST"])
 def edit_news(news_id):
+
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
 
@@ -135,10 +179,11 @@ def edit_news(news_id):
     return render_template("edit.html", news=news)
 
 # =========================
-# عرض خبر واحد
+# Single news page
 # =========================
 @app.route("/news/<int:news_id>")
 def single_news(news_id):
+
     conn = sqlite3.connect("news.db")
     c = conn.cursor()
 
@@ -150,7 +195,7 @@ def single_news(news_id):
     return render_template("single.html", news=news)
 
 # =========================
-# تشغيل السيرفر
+# Run server
 # =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
