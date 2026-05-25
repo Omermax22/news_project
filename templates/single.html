@@ -6,6 +6,7 @@
     <title>{{ news[1] }}</title>
 
     <style>
+
         body{
             font-family: Arial;
             background:#f4f4f4;
@@ -43,6 +44,11 @@
             margin-top:20px;
         }
 
+        .stats{
+            margin-top:10px;
+            color:#666;
+        }
+
         a{
             display:inline-block;
             margin-top:20px;
@@ -52,7 +58,54 @@
             padding:10px 20px;
             border-radius:5px;
         }
+
+        .comments{
+            margin-top:40px;
+        }
+
+        .comment-box{
+            background:#f9f9f9;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:15px;
+        }
+
+        .comment-user{
+            font-weight:bold;
+            margin-bottom:10px;
+        }
+
+        textarea{
+            width:100%;
+            height:100px;
+            padding:10px;
+            border-radius:10px;
+            border:1px solid #ccc;
+            margin-top:10px;
+        }
+
+        button{
+            margin-top:10px;
+            background:#111;
+            color:white;
+            border:none;
+            padding:10px 20px;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+        .like-btn{
+            display:inline-block;
+            margin-top:10px;
+            background:red;
+            color:white;
+            padding:8px 15px;
+            border-radius:5px;
+            text-decoration:none;
+        }
+
     </style>
+
 </head>
 
 <body>
@@ -67,11 +120,63 @@
 
         <p>{{ news[2] }}</p>
 
+        <div class="stats">
+            👁️ المشاهدات: {{ news[4] }} |
+            ❤️ الإعجابات: {{ news[5] }}
+        </div>
+
+        <a class="like-btn" href="/like/{{ news[0] }}">
+            ❤️ إعجاب
+        </a>
+
         <div class="date">
             📅 {{ news[4] }}
         </div>
 
         <a href="/">⬅ رجوع</a>
+
+        <!-- التعليقات -->
+        <div class="comments">
+
+            <h2>💬 التعليقات</h2>
+
+            {% if session.get("user") %}
+
+            <form action="/add-comment/{{ news[0] }}" method="POST">
+
+                <textarea name="comment" placeholder="اكتب تعليقك..." required></textarea>
+
+                <button type="submit">إرسال التعليق</button>
+
+            </form>
+
+            {% else %}
+
+            <p>يجب تسجيل الدخول لإضافة تعليق</p>
+
+            <a href="/login">تسجيل الدخول</a>
+
+            {% endif %}
+
+            <hr>
+
+            {% for comment in comments %}
+
+            <div class="comment-box">
+
+                <div class="comment-user">
+                    👤 {{ comment[0] }}
+                </div>
+
+                <div>
+                    {{ comment[1] }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
 
     </div>
 
